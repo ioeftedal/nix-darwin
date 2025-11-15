@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -33,6 +34,7 @@
   outputs = inputs @ {
     self,
     nixpkgs,
+    nixpkgs-unstable,
     nix-darwin,
     home-manager,
     nix-homebrew,
@@ -41,6 +43,11 @@
     theme-bobthefish,
   }: let
     configuration = {pkgs, ...}: {
+      nixpkgs.overlays = [
+        (final: prev: {
+          lazygit = nixpkgs-unstable.legacyPackages.${prev.system}.lazygit;
+        })
+      ];
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
       environment.systemPackages = [
